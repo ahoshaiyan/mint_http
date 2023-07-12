@@ -48,7 +48,7 @@ module MintHttp
       raise ArgumentError, 'Expected a MintHttp::Pool' unless Pool === pool
 
       @pool = pool
-      self
+      header('Connection' => 'keep-alive')
     end
 
     def timeout(open, write, read)
