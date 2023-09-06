@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mint_http (0.1.0)
+    mint_http (0.1.1)
       base64
       json
       net-http
@@ -13,7 +13,7 @@ GEM
   specs:
     base64 (0.1.0)
     ipaddr (1.2.4)
-    json (2.6.2)
+    json (2.5.1)
     minitest (5.18.0)
     net-http (0.3.2)
       uri

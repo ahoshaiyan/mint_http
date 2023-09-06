@@ -47,15 +47,15 @@ module MintHttp
     def raise!
       case @status_code
         when 401
-          raise Errors::AuthenticationError.new('Unauthenticated', self)
+          raise AuthenticationError.new('Unauthenticated', self)
         when 403
-          raise Errors::AuthorizationError.new('Forbidden', self)
+          raise AuthorizationError.new('Forbidden', self)
         when 404
-          raise Errors::NotFoundError.new('Not Found', self)
+          raise NotFoundError.new('Not Found', self)
         when 400..499
-          raise Errors::ClientError.new('Client Error', self)
+          raise ClientError.new('Client Error', self)
         when 500..599
-          raise Errors::ClientError.new('Server Error', self)
+          raise ClientError.new('Server Error', self)
         else
           self
       end
