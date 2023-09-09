@@ -55,6 +55,8 @@ module MintHttp
       @open_timeout = open
       @write_timeout = write
       @read_timeout = read
+
+      self
     end
 
     def base_url(url)
