@@ -49,6 +49,8 @@ module MintHttp
 
       @pool = pool
       header('Connection' => 'keep-alive')
+
+      self
     end
 
     def timeout(open, write, read)
@@ -152,6 +154,7 @@ module MintHttp
       @body_type = :raw
       @body = raw
       content_type(nil)
+
       self
     end
 
