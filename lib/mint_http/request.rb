@@ -153,7 +153,10 @@ module MintHttp
     def with_body(raw)
       @body_type = :raw
       @body = raw
-      content_type(nil)
+
+      unless @headers['Content-Type']
+        content_type('application/octet-stream')
+      end
 
       self
     end
@@ -235,7 +238,9 @@ module MintHttp
         raise ArgumentError, "Only HTTP and HTTPS URLs are allowed"
       end
 
-      url.query = URI.encode_www_form(@query)
+      unless (encoded_query = URI.encode_www_form(@query)).empty?
+        url.query = encoded_query
+      end
 
       net_request = case method.to_s
         when 'get'
