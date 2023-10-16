@@ -20,6 +20,8 @@ module MintHttp
     attr_reader :cert
     attr_reader :proxy_address
     attr_reader :proxy_port
+    attr_reader :ssl_verify_mode
+    attr_reader :ssl_verify_hostname
 
     def initialize
       @pool = nil
@@ -39,6 +41,8 @@ module MintHttp
       @proxy_port = nil
       @proxy_user = nil
       @proxy_pass = nil
+      @ssl_verify_mode = nil
+      @ssl_verify_hostname = nil
 
       header('User-Agent' => 'Mint Http')
       as_json
@@ -63,6 +67,16 @@ module MintHttp
 
     def base_url(url)
       @base_url = URI.parse(url)
+      self
+    end
+
+    def ssl_verify_mode(mode)
+      @ssl_verify_mode = mode
+      self
+    end
+
+    def ssl_verify_hostname(verify)
+      @ssl_verify_hostname = verify
       self
     end
 
@@ -297,6 +311,8 @@ module MintHttp
         proxy_port: @proxy_port,
         proxy_user: @proxy_user,
         proxy_pass: @proxy_pass,
+        verify_mode: @ssl_verify_mode,
+        verify_hostname: @ssl_verify_hostname,
       }
 
       [url, net_request, options]
