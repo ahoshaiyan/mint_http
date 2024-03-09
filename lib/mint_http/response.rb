@@ -55,7 +55,7 @@ module MintHttp
         when 400..499
           raise ClientError.new('Client Error', self)
         when 500..599
-          raise ClientError.new('Server Error', self)
+          raise ServerError.new('Server Error', self)
         else
           self
       end
