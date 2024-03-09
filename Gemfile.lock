@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mint_http (0.1.5)
+    mint_http (0.1.6)
       base64
       json
       net-http

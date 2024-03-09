@@ -336,7 +336,7 @@ module MintHttp
         if @pool
           @pool.release(net_http)
         else
-          net_http.finish
+          net_http.finish if net_http.started?
         end
       end
     end
