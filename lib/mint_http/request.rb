@@ -283,6 +283,10 @@ module MintHttp
           net_request.body = @body
         when :json
           net_request.body = @body.to_json if @body
+
+          if String === @body
+            net_request.body = @body
+          end
         when :form
           net_request.body = URI.encode_www_form(@body) if @body
         when :multipart

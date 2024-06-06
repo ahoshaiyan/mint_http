@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mint_http (0.1.6)
+    mint_http (0.1.8)
       base64
       json
       net-http
@@ -11,16 +11,14 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    base64 (0.1.1)
-    ipaddr (1.2.5)
-    json (2.6.3)
+    base64 (0.2.0)
+    json (2.7.2)
     minitest (5.18.0)
-    net-http (0.3.2)
+    net-http (0.4.1)
       uri
-    openssl (2.2.3)
-      ipaddr
+    openssl (3.2.0)
     rake (13.0.6)
-    uri (0.12.2)
+    uri (0.13.0)
 
 PLATFORMS
   arm64-darwin-22
@@ -31,4 +29,4 @@ DEPENDENCIES
   rake (~> 13.0)
 
 BUNDLED WITH
-   2.2.33
+   2.3.16
