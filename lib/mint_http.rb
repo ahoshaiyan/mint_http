@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
+require 'logger'
+
 require_relative 'mint_http/version'
+require_relative 'mint_http/config'
 require_relative 'mint_http/pool_entry'
 require_relative 'mint_http/pool'
 require_relative 'mint_http/headers'
@@ -16,6 +19,17 @@ require_relative 'mint_http/request'
 
 module MintHttp
   class << self
+    def init_mint
+      config.logger = Logger.new('/dev/null')
+      config.filter_parameters = []
+    end
+
+    # @return [MintHttp::Config]
+    # noinspection RbsMissingTypeSignature,RubyClassVariableUsageInspection
+    def config
+      @@config ||= MintHttp::Config.new
+    end
+
     # @return [::MintHttp::Request]
     def method_missing(method, *args)
       request = Request.new
@@ -23,3 +37,5 @@ module MintHttp
     end
   end
 end
+
+MintHttp.init_mint
