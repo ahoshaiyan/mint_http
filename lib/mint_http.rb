@@ -14,6 +14,7 @@ require_relative 'mint_http/errors/authorization_error'
 require_relative 'mint_http/errors/authentication_error'
 require_relative 'mint_http/errors/not_found_error'
 require_relative 'mint_http/net_http_factory'
+require_relative 'mint_http/request_logger'
 require_relative 'mint_http/response'
 require_relative 'mint_http/request'
 
@@ -21,7 +22,8 @@ module MintHttp
   class << self
     def init_mint
       config.logger = Logger.new('/dev/null')
-      config.filter_parameters = []
+      config.filter_params_list = []
+      config.filter_params = false
     end
 
     # @return [MintHttp::Config]
