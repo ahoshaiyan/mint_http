@@ -87,7 +87,7 @@ module MintHttp
         @@ TLS: #{tls}
         -> #{@request.method.upcase} #{path} HTTP/#{version}
         #{masked_headers(@net_request.each_header.to_h, '-> ')}
-        -> #{masked_body(@request.body, @request.headers['content-type'])}
+        -> #{masked_body(@net_request.body, @request.headers['content-type'])}
         =======
       TXT
 
@@ -163,6 +163,8 @@ module MintHttp
     end
 
     def masked_body(body, type)
+      type ||= 'application/octet-stream'
+
       size = body&.bytesize || 0
       if size == 0
         return '[EMPTY]'
