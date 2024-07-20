@@ -168,16 +168,16 @@ module MintHttp
         return '[EMPTY]'
       end
 
-      unless @filter
-        return body
-      end
-
       if size > MAX_BODY_SIZE
         return '[LARGE]'
       end
 
       unless body_allowed?(type)
         return '[COMPLEX]'
+      end
+
+      unless @filter
+        return body
       end
 
       if type.match?(/json/)
