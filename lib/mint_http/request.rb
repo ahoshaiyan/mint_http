@@ -23,6 +23,10 @@ module MintHttp
     attr_reader :ssl_verify_mode
     attr_reader :ssl_verify_hostname
 
+    # Attributes only available when request is made
+    attr_reader :method
+    attr_reader :request_url
+
     def initialize
       @pool = nil
       @base_url = nil
@@ -43,6 +47,10 @@ module MintHttp
       @proxy_pass = nil
       @ssl_verify_mode = nil
       @ssl_verify_hostname = nil
+
+      @logger = MintHttp.config.logger
+      @filter_params_list = MintHttp.config.filter_params_list
+      @filter_params = MintHttp.config.filter_params
 
       header('User-Agent' => 'Mint Http')
       as_json
@@ -204,6 +212,28 @@ module MintHttp
       self
     end
 
+    # @param [Logger] logger
+    def use_logger(logger)
+      @logger = logger
+      self
+    end
+
+    def no_logger
+      @logger = Logger.new('/dev/null')
+      self
+    end
+
+    # @param [Array[String]] params
+    def filter_param(*params)
+      @filter_params_list.concat(params)
+      self
+    end
+
+    def should_filter_params(filter = true)
+      @filter_params = filter
+      self
+    end
+
     def get(url, params = {})
       query(params).send_request('get', url)
     end
@@ -233,20 +263,60 @@ module MintHttp
     end
 
     def send_request(method, url)
+      @method = method
+
+      logger = RequestLogger.new(@logger, @filter_params_list, @filter_params)
       url, net_request, options = build_request(method, url)
 
-      res = with_client(url.hostname, url.port, options) do |http|
-        http.request(net_request)
+      logger.log_request(self, net_request)
+      logger.log_start
+
+      begin
+        res = with_client(url.hostname, url.port, options) do |http|
+          logger.log_connected
+          logger.log_connection_info(http)
+          http.request(net_request)
+        end
+      rescue StandardError => error
+        logger.log_end
+        logger.log_error(error)
+        logger.write_log
+        raise error
       end
 
-      Response.new(res)
+      logger.log_end
+
+      response = Response.new(res, net_request, self)
+
+      logger.log_response(response)
+      logger.put_timing(response)
+      logger.write_log
+
+      response
     end
 
     private
 
-    def build_request(method, url)
+    def build_url(url)
       url = URI.parse(url)
-      url = @base_url + url if @base_url
+
+      unless url.is_a?(URI::Generic)
+        return url
+      end
+
+      unless @base_url
+        return url
+      end
+
+      unless @base_url.path.match?(/\/$/)
+        @base_url.path += '/'
+      end
+
+      @base_url + url.path.gsub(/^\/+/, '')
+    end
+
+    def build_request(method, url)
+      @request_url = url = build_url(url)
 
       unless %w[http https].include?(url.scheme)
         raise ArgumentError, "Only HTTP and HTTPS URLs are allowed"
@@ -347,6 +417,10 @@ module MintHttp
 
     def net_factory
       @net_factory ||= NetHttpFactory.new
+    end
+
+    def clock_time
+      Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
   end
 end

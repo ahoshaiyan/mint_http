@@ -2,14 +2,47 @@
 
 module MintHttp
   class Response
+    # @!attribute [r] net_request
+    #   @return [Net::HTTPRequest]
+    attr_reader :net_request
+
+    # @!attribute [r] net_response
+    #   @return [Net::HTTPResponse]
     attr_reader :net_response
+
+    # @!attribute [r] mint_request
+    #   @return [MintHttp::Request]
+    attr_reader :mint_request
+
+    # @!attribute [r] version
+    #   @return [String]
     attr_reader :version
+
+    # @!attribute [r] status_code
+    #   @return [Integer]
     attr_reader :status_code
+
+    # @!attribute [r] status_text
+    #   @return [String]
     attr_reader :status_text
+
+    # @!attribute [r] headers
+    #   @return [Hash<String,Array[String]>]
     attr_reader :headers
 
-    def initialize(net_response)
+    attr_accessor :time_started
+    attr_accessor :time_ended
+    attr_accessor :time_connected
+    attr_accessor :time_total
+    attr_accessor :time_connecting
+
+    # @param [Net::HTTPResponse] net_response
+    # @param [Net::HTTPRequest] net_request
+    # @param [MintHttp::Request] mint_request
+    def initialize(net_response, net_request, mint_request)
       @net_response = net_response
+      @net_request = net_request
+      @mint_request = mint_request
       @version = net_response.http_version
       @status_code = net_response.code.to_i
       @status_text = net_response.message
@@ -67,6 +100,18 @@ module MintHttp
 
     def json
       @json ||= JSON.parse(body)
+    end
+
+    def json?
+      headers['content-type']&.include?('application/json')
+    end
+
+    def xml?
+      headers['content-type']&.match?(/\/xml/)
+    end
+
+    def https?
+      @net_request
     end
 
     def inspect
