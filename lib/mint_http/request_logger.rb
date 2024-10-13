@@ -109,7 +109,7 @@ module MintHttp
 
       @logger.info(buffer.strip)
     rescue Encoding::CompatibilityError => e
-      logger.logger.warn(e)
+      @logger.warn(e)
     end
 
     def log_connection_info(http)
