@@ -165,7 +165,7 @@ module MintHttp
     end
 
     def accept_json
-      accept('application/json')
+      accept('application/json; charset=utf-8')
     end
 
     def content_type(type)
@@ -185,7 +185,7 @@ module MintHttp
 
     def as_json
       @body_type = :json
-      content_type('application/json')
+      content_type('application/json; charset=utf-8')
     end
 
     def as_form

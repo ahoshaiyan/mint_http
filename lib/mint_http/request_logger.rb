@@ -79,7 +79,7 @@ module MintHttp
         tls = "#{@tls_config[:version]} Cipher: #{@tls_config[:cipher]}"
       end
 
-      buffer = String.new
+      buffer = String.new(encoding: 'UTF-8')
       buffer << <<~TXT
         MintHttp Log (#{@request.request_url})
         @@ Timeouts: #{@request.open_timeout}, #{@request.write_timeout}, #{@request.read_timeout}
@@ -108,6 +108,8 @@ module MintHttp
       end
 
       @logger.info(buffer.strip)
+    rescue Encoding::CompatibilityError => e
+      logger.logger.warn(e)
     end
 
     def log_connection_info(http)
@@ -177,6 +179,9 @@ module MintHttp
       unless body_allowed?(type)
         return '[COMPLEX]'
       end
+
+      # Force encoding to UTF-8 to allow logging
+      body = body.dup.force_encoding('utf-8')
 
       unless @filter
         return body
