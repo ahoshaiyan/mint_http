@@ -5,6 +5,7 @@ require 'net/http'
 require 'uri'
 require 'openssl'
 require 'json'
+require 'resolv'
 
 module MintHttp
   class Request
@@ -281,6 +282,7 @@ module MintHttp
         logger.log_end
         logger.log_error(error)
         logger.write_log
+
         raise error
       end
 
@@ -293,6 +295,33 @@ module MintHttp
       logger.write_log
 
       response
+
+    rescue SocketError => e
+      if e.message.include?('getaddrinfo') || e.cause.is_a?(Resolv::ResolvError) || e.cause.is_a?(Resolv::ResolvTimeout)
+        raise NameResolutionError, e.message
+      else
+        raise ConnectionIoError, e.message
+      end
+
+    rescue Net::OpenTimeout => e
+      raise OpenTimeoutError, e.message
+    rescue Net::WriteTimeout => e
+      raise WriteTimeoutError, e.message
+    rescue Net::ReadTimeout => e
+      raise ReadTimeoutError, e.message
+
+    rescue Errno::ECONNREFUSED => e
+      raise ConnectionRefusedError, e.message
+    rescue Errno::ECONNRESET => e
+      raise ConnectionResetError, e.message
+
+    rescue IOError, EOFError, Errno::EPIPE, Errno::EIO => e
+      raise ConnectionIoError, e.message
+    rescue Errno::EHOSTUNREACH, Errno::ENETUNREACH => e
+      raise ConnectionError, e.message
+
+    rescue OpenSSL::SSL::SSLError => e
+      raise ConnectionSslError, e.message
     end
 
     private

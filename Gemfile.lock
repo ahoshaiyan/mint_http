@@ -1,11 +1,12 @@
 PATH
   remote: .
   specs:
-    mint_http (0.1.8)
+    mint_http (0.1.12)
       base64
       json
       net-http
       openssl
+      resolv
       uri
 
 GEM
@@ -18,6 +19,9 @@ GEM
       uri
     openssl (3.2.0)
     rake (13.0.6)
+    resolv (0.4.0)
+    resolv-replace (0.1.1)
+      resolv
     uri (0.13.0)
 
 PLATFORMS
@@ -27,6 +31,7 @@ DEPENDENCIES
   minitest (~> 5.0)
   mint_http!
   rake (~> 13.0)
+  resolv-replace
 
 BUNDLED WITH
-   2.3.16
+   2.5.6

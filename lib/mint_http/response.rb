@@ -85,6 +85,12 @@ module MintHttp
           raise AuthorizationError.new('Forbidden', self)
         when 404
           raise NotFoundError.new('Not Found', self)
+        when 502
+          raise BadGatewayError.new('Bad Gateway', self)
+        when 503
+          raise ServiceUnavailableError.new('Service Unavailable', self)
+        when 504
+          raise GatewayTimeoutError.new('Gateway Timeout', self)
         when 400..499
           raise ClientError.new('Client Error', self)
         when 500..599
