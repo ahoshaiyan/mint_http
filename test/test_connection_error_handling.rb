@@ -22,7 +22,7 @@ class TestConnectionErrorHandling < Minitest::Test
       MintHttp.timeout(1, 1, 1).get('http://no.example.com')
     end
 
-    assert_equal SocketError, error.cause.class
+    assert_equal Socket::ResolutionError, error.cause.class
 
     # Test error is raised when using resolv-replace
     require 'resolv-replace'

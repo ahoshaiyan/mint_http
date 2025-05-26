@@ -23,6 +23,8 @@ module MintHttp
     attr_reader :proxy_port
     attr_reader :ssl_verify_mode
     attr_reader :ssl_verify_hostname
+    attr_reader :ssl_min_version
+    attr_reader :ssl_max_version
 
     # Attributes only available when request is made
     attr_reader :method
@@ -48,6 +50,8 @@ module MintHttp
       @proxy_pass = nil
       @ssl_verify_mode = nil
       @ssl_verify_hostname = nil
+      @ssl_min_version = nil
+      @ssl_max_version = nil
 
       @logger = MintHttp.config.logger
       @filter_params_list = MintHttp.config.filter_params_list
@@ -86,6 +90,12 @@ module MintHttp
 
     def ssl_verify_hostname(verify)
       @ssl_verify_hostname = verify
+      self
+    end
+
+    def ssl_version(min, max)
+      @ssl_min_version = min
+      @ssl_max_version = max
       self
     end
 
@@ -416,6 +426,8 @@ module MintHttp
         proxy_pass: @proxy_pass,
         verify_mode: @ssl_verify_mode,
         verify_hostname: @ssl_verify_hostname,
+        min_version: @ssl_min_version,
+        max_version: @ssl_max_version,
       }
 
       [url, net_request, options]

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mint_http (0.1.12)
+    mint_http (1.0.1)
       base64
       json
       net-http
@@ -26,6 +26,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-22
+  arm64-darwin-23
 
 DEPENDENCIES
   minitest (~> 5.0)
