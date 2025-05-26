@@ -65,6 +65,9 @@ class MintHttp::NetHttpFactory
     net_http.key = options[:key]
     net_http.verify_mode = options[:verify_mode]
     net_http.verify_hostname = options[:verify_hostname]
+    net_http.min_version = options[:min_version]
+    net_http.max_version = options[:max_version]
+    
 
     if OpenSSL::X509::Store === options[:ca]
       net_http.cert_store = options[:ca]
