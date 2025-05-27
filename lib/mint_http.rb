@@ -12,6 +12,7 @@ require_relative 'mint_http/net_http_factory'
 require_relative 'mint_http/request_logger'
 require_relative 'mint_http/response'
 require_relative 'mint_http/request'
+require_relative 'mint_http/net_http'
 
 module MintHttp
   class << self

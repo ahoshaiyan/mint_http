@@ -30,16 +30,39 @@ module MintHttp
     #   @return [Hash<String,Array[String]>]
     attr_reader :headers
 
+    # @!attribute [r] time_started
+    #   @return [Numeric]
     attr_accessor :time_started
+
+    # @!attribute [r] time_ended
+    #   @return [Numeric]
     attr_accessor :time_ended
+
+    # @!attribute [r] time_connected
+    #   @return [Numeric]
     attr_accessor :time_connected
+
+    # @!attribute [r] time_total
+    #   @return [Numeric]
     attr_accessor :time_total
+
+    # @!attribute [r] time_connecting
+    #   @return [Numeric]
     attr_accessor :time_connecting
+
+    # @!attribute [r] local_address
+    #   @return [Addrinfo]
+    attr_reader :local_address
+
+    # @!attribute [r] remote_address
+    #   @return [Addrinfo]
+    attr_reader :remote_address
 
     # @param [Net::HTTPResponse] net_response
     # @param [Net::HTTPRequest] net_request
     # @param [MintHttp::Request] mint_request
-    def initialize(net_response, net_request, mint_request)
+    # @param [Net::HTTP]
+    def initialize(net_response, net_request, mint_request, net_http)
       @net_response = net_response
       @net_request = net_request
       @mint_request = mint_request
@@ -47,6 +70,10 @@ module MintHttp
       @status_code = net_response.code.to_i
       @status_text = net_response.message
       @headers = Headers.new.merge(net_response.each_header.to_h)
+
+      tcp_socket = net_http.underlying_tcp_socket
+      @local_address = tcp_socket.local_address rescue nil
+      @remote_address = tcp_socket.remote_address rescue nil
     end
 
     def success?
