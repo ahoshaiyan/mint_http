@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mint_http (1.0.1)
+    mint_http (1.1.0)
       base64
       json
       net-http
@@ -15,6 +15,7 @@ GEM
     base64 (0.2.0)
     json (2.7.2)
     minitest (5.18.0)
+    mutex_m (0.2.0)
     net-http (0.4.1)
       uri
     openssl (3.2.0)
@@ -27,10 +28,12 @@ GEM
 PLATFORMS
   arm64-darwin-22
   arm64-darwin-23
+  arm64-darwin-24
 
 DEPENDENCIES
   minitest (~> 5.0)
   mint_http!
+  mutex_m
   rake (~> 13.0)
   resolv-replace
 

@@ -6,6 +6,7 @@ class MintHttp::Pool
   attr_reader :timeout
   attr_reader :size
   attr_reader :usage_limit
+  attr_reader :created_connections
 
   def initialize(options = {})
     @mutex = Mutex.new
@@ -16,6 +17,7 @@ class MintHttp::Pool
 
     @size = options[:size] || 10
     @usage_limit = options[:usage_limit] || 100
+    @created_connections = 0
 
     @pool = []
   end
@@ -43,6 +45,9 @@ class MintHttp::Pool
           client = net_factory.make_client(hostname, port, options)
           entry = append(client, namespace)
           entry.acquire!
+
+          @created_connections += 1
+
           return entry.client
         end
       end
@@ -67,6 +72,10 @@ class MintHttp::Pool
 
       clean_pool_unsafe!
     end
+  end
+
+  def current_size
+    @mutex.synchronize { @pool.length }
   end
 
   private

@@ -283,10 +283,12 @@ module MintHttp
       logger.log_start
 
       begin
-        res = with_client(url.hostname, url.port, options) do |http|
+        response = with_client(url.hostname, url.port, options) do |http|
           logger.log_connected
           logger.log_connection_info(http)
-          http.request(net_request)
+          net_response = http.request(net_request)
+
+          Response.new(net_response, net_request, self, http)
         end
       rescue StandardError => error
         logger.log_end
@@ -297,9 +299,6 @@ module MintHttp
       end
 
       logger.log_end
-
-      response = Response.new(res, net_request, self)
-
       logger.log_response(response)
       logger.put_timing(response)
       logger.write_log

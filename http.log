@@ -1,0 +1,692 @@
+I, [2024-07-20T17:01:40.725955 #38292]  INFO -- : MintHttp Log (https://api.moyasar.com)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619603.133 -> 619603.425 connecting: 0.292 total: 0.395 seconds
+@@ TLS: TLSv1.2 Cipher: ECDHE-RSA-AES128-GCM-SHA256
+-> POST  HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: api.moyasar.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 404 Not Found
+<- Date: Sat, 20 Jul 2024 14:01:40 GMT
+<- Content-Type: application/json; charset=utf-8
+<- Content-Length: 91
+<- Connection: keep-alive
+<- X-Frame-Options: SAMEORIGIN
+<- X-Xss-Protection: 0
+<- X-Content-Type-Options: nosniff
+<- X-Download-Options: noopen
+<- X-Permitted-Cross-Domain-Policies: none
+<- Referrer-Policy: strict-origin-when-cross-origin
+<- X-Request-Id: b1b4dd16-ffff-4e75-96d6-0752264ab291
+<- X-Runtime: 0.005768
+<- Strict-Transport-Security: max-age=63072000; includeSubDomains
+<- Vary: Origin
+<- Length: 91 Body: {
+  "type": "invalid_request_error",
+  "message": "Resource not found",
+  "errors": null
+}
+I, [2024-07-20T17:01:42.689559 #38292]  INFO -- : MintHttp Log (https://ipinfo.com/1.1.1.1)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619604.935 -> 619605.308 connecting: 0.373 total: 0.556 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_256_GCM_SHA384
+-> POST /1.1.1.1 HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: ipinfo.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 404 Not Found
+<- Date: Sat, 20 Jul 2024 14:01:42 GMT
+<- Server: Apache
+<- Content-Length: 315
+<- Content-Type: text/html; charset=iso-8859-1
+<- Length: 315 Body: <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL was not found on this server.</p>
+<p>Additionally, a 404 Not Found
+error was encountered while trying to use an ErrorDocument to handle the request.</p>
+</body></html>
+I, [2024-07-20T17:01:43.075798 #38292]  INFO -- : MintHttp Log (https://jsonplaceholder.typicode.com/todos)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619605.492 -> 619605.671 connecting: 0.179 total: 0.385 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_256_GCM_SHA384
+-> POST /todos HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: jsonplaceholder.typicode.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 201 Created
+<- Date: Sat, 20 Jul 2024 14:01:43 GMT
+<- Content-Type: application/json; charset=utf-8
+<- Content-Length: 31
+<- Connection: keep-alive
+<- Report-To: {"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1721484103&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=b4Wm3JpEawzMn3h85DNdBHYfHUie%2BeyhfNXaCcm4ybI%3D"}]}
+<- Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1721484103&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=b4Wm3JpEawzMn3h85DNdBHYfHUie%2BeyhfNXaCcm4ybI%3D
+<- Nel: {"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}
+<- X-Powered-By: Express
+<- X-Ratelimit-Limit: 1000
+<- X-Ratelimit-Remaining: 999
+<- X-Ratelimit-Reset: 1721484152
+<- Vary: Origin, X-HTTP-Method-Override, Accept-Encoding
+<- Access-Control-Allow-Credentials: true
+<- Cache-Control: no-cache
+<- Pragma: no-cache
+<- Expires: -1
+<- Access-Control-Expose-Headers: Location
+<- Location: https://jsonplaceholder.typicode.com/todos/201
+<- X-Content-Type-Options: nosniff
+<- Etag: W/"1f-v7q09ihdcrnA2mAxihAAQHEaYaQ"
+<- Via: 1.1 vegur
+<- Cf-Cache-Status: DYNAMIC
+<- Server: cloudflare
+<- Cf-Ray: 8a637c1bd939374b-MXP
+<- Alt-Svc: h3=":443"; ma=86400
+<- Length: 31 Body: {
+  "foo": "bar",
+  "id": 201
+}
+I, [2024-07-20T17:01:41.122566 #38292]  INFO -- : MintHttp Log (https://api.moyasar.com/v1/payments)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619603.534 -> 619603.822 connecting: 0.288 total: 0.39 seconds
+@@ TLS: TLSv1.2 Cipher: ECDHE-RSA-AES128-GCM-SHA256
+-> POST /v1/payments HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: api.moyasar.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 401 Unauthorized
+<- Date: Sat, 20 Jul 2024 14:01:41 GMT
+<- Content-Type: application/json; charset=utf-8
+<- Content-Length: 91
+<- Connection: keep-alive
+<- X-Frame-Options: SAMEORIGIN
+<- X-Xss-Protection: 0
+<- X-Content-Type-Options: nosniff
+<- X-Download-Options: noopen
+<- X-Permitted-Cross-Domain-Policies: none
+<- Referrer-Policy: strict-origin-when-cross-origin
+<- Www-Authenticate: Basic realm="Application"
+<- Cache-Control: no-cache
+<- X-Request-Id: 763be73c-965f-4a9a-9625-311451e4ae28
+<- X-Runtime: 0.005780
+<- Strict-Transport-Security: max-age=63072000; includeSubDomains
+<- Vary: Origin
+<- Length: 91 Body: {"type":"authentication_error","message":"Invalid authorization credentials","errors":null}
+I, [2024-07-20T17:01:41.431665 #38292]  INFO -- : MintHttp Log (https://dashboard.moyasar.com)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619603.925 -> 619604.121 connecting: 0.196 total: 0.308 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_128_GCM_SHA256
+-> POST  HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: dashboard.moyasar.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 500 Internal Server Error
+<- Date: Sat, 20 Jul 2024 14:01:41 GMT
+<- Content-Type: text/plain; charset=utf-8
+<- Transfer-Encoding: chunked
+<- Connection: keep-alive
+<- X-Request-Id: 61cd5ca0-98a2-4b11-aa7a-93aa6b999026
+<- X-Runtime: 0.003495
+<- Vary: Accept-Encoding
+<- Strict-Transport-Security: max-age=63072000; includeSubDomains
+<- Length: 182 Body: 500 Internal Server Error
+If you are the administrator of this website, then please read this web application's log file and/or the web server's log file to find out what went wrong.
+I, [2024-07-20T17:01:44.144972 #38292]  INFO -- : MintHttp Log (https://jsonplaceholder.typicode.com/posts/1)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619606.577 -> 619606.747 connecting: 0.17 total: 0.37 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_256_GCM_SHA384
+-> POST /posts/1 HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: jsonplaceholder.typicode.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 404 Not Found
+<- Date: Sat, 20 Jul 2024 14:01:44 GMT
+<- Content-Type: application/json; charset=utf-8
+<- Content-Length: 2
+<- Connection: keep-alive
+<- Report-To: {"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1721484104&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=6Kc1EgeyymsGCnxaFYx8FFjCqSjPngbLD%2Fy%2Bn7QqOow%3D"}]}
+<- Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1721484104&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=6Kc1EgeyymsGCnxaFYx8FFjCqSjPngbLD%2Fy%2Bn7QqOow%3D
+<- Nel: {"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}
+<- X-Powered-By: Express
+<- X-Ratelimit-Limit: 1000
+<- X-Ratelimit-Remaining: 997
+<- X-Ratelimit-Reset: 1721484152
+<- Vary: Origin, X-HTTP-Method-Override, Accept-Encoding
+<- Access-Control-Allow-Credentials: true
+<- Cache-Control: no-cache
+<- Pragma: no-cache
+<- Expires: -1
+<- X-Content-Type-Options: nosniff
+<- Etag: W/"2-vyGp6PvFo4RvsFtPoIWeCReyIC8"
+<- Via: 1.1 vegur
+<- Cf-Cache-Status: DYNAMIC
+<- Server: cloudflare
+<- Cf-Ray: 8a637c2298c0bab7-MXP
+<- Alt-Svc: h3=":443"; ma=86400
+<- Length: 2 Body: {}
+I, [2024-07-20T17:01:44.523950 #38292]  INFO -- : MintHttp Log (https://jsonplaceholder.typicode.com/posts)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619606.947 -> 619607.12 connecting: 0.173 total: 0.378 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_256_GCM_SHA384
+-> POST /posts HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: jsonplaceholder.typicode.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 201 Created
+<- Date: Sat, 20 Jul 2024 14:01:44 GMT
+<- Content-Type: application/json; charset=utf-8
+<- Content-Length: 31
+<- Connection: keep-alive
+<- Report-To: {"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1721484104&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=6Kc1EgeyymsGCnxaFYx8FFjCqSjPngbLD%2Fy%2Bn7QqOow%3D"}]}
+<- Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1721484104&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=6Kc1EgeyymsGCnxaFYx8FFjCqSjPngbLD%2Fy%2Bn7QqOow%3D
+<- Nel: {"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}
+<- X-Powered-By: Express
+<- X-Ratelimit-Limit: 1000
+<- X-Ratelimit-Remaining: 996
+<- X-Ratelimit-Reset: 1721484152
+<- Vary: Origin, X-HTTP-Method-Override, Accept-Encoding
+<- Access-Control-Allow-Credentials: true
+<- Cache-Control: no-cache
+<- Pragma: no-cache
+<- Expires: -1
+<- Access-Control-Expose-Headers: Location
+<- Location: https://jsonplaceholder.typicode.com/posts/101
+<- X-Content-Type-Options: nosniff
+<- Etag: W/"1f-sBekL1M+V8GEMnkCGs539pAhjpU"
+<- Via: 1.1 vegur
+<- Cf-Cache-Status: DYNAMIC
+<- Server: cloudflare
+<- Cf-Ray: 8a637c24ee9b83a2-MXP
+<- Alt-Svc: h3=":443"; ma=86400
+<- Length: 31 Body: {
+  "foo": "bar",
+  "id": 101
+}
+I, [2024-07-20T17:01:43.774717 #38292]  INFO -- : MintHttp Log (https://jsonplaceholder.typicode.com/todos/1)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619605.878 -> 619606.057 connecting: 0.179 total: 0.698 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_256_GCM_SHA384
+-> POST /todos/1 HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: jsonplaceholder.typicode.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 404 Not Found
+<- Date: Sat, 20 Jul 2024 14:01:43 GMT
+<- Content-Type: application/json; charset=utf-8
+<- Content-Length: 2
+<- Connection: keep-alive
+<- Report-To: {"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1721484103&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=b4Wm3JpEawzMn3h85DNdBHYfHUie%2BeyhfNXaCcm4ybI%3D"}]}
+<- Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1721484103&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=b4Wm3JpEawzMn3h85DNdBHYfHUie%2BeyhfNXaCcm4ybI%3D
+<- Nel: {"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}
+<- X-Powered-By: Express
+<- X-Ratelimit-Limit: 1000
+<- X-Ratelimit-Remaining: 998
+<- X-Ratelimit-Reset: 1721484152
+<- Vary: Origin, X-HTTP-Method-Override, Accept-Encoding
+<- Access-Control-Allow-Credentials: true
+<- Cache-Control: no-cache
+<- Pragma: no-cache
+<- Expires: -1
+<- X-Content-Type-Options: nosniff
+<- Etag: W/"2-vyGp6PvFo4RvsFtPoIWeCReyIC8"
+<- Via: 1.1 vegur
+<- Cf-Cache-Status: DYNAMIC
+<- Server: cloudflare
+<- Cf-Ray: 8a637c1e4a94ba8c-MXP
+<- Alt-Svc: h3=":443"; ma=86400
+<- Length: 2 Body: {}
+I, [2024-07-20T17:01:42.133289 #38292]  INFO -- : MintHttp Log (https://example.com)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619604.234 -> 619604.717 connecting: 0.482 total: 0.701 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_256_GCM_SHA384
+-> POST  HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: example.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 200 OK
+<- Accept-Ranges: bytes
+<- Cache-Control: max-age=604800
+<- Content-Type: text/html; charset=UTF-8
+<- Date: Sat, 20 Jul 2024 14:01:42 GMT
+<- Etag: "3147526947"
+<- Expires: Sat, 27 Jul 2024 14:01:42 GMT
+<- Last-Modified: Thu, 17 Oct 2019 07:18:26 GMT
+<- Server: EOS (vny/044F)
+<- Content-Length: 1256
+<- Length: 1256 Body: <!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type="text/css">
+    body {
+        background-color: #f0f0f2;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        
+    }
+    div {
+        width: 600px;
+        margin: 5em auto;
+        padding: 2em;
+        background-color: #fdfdff;
+        border-radius: 0.5em;
+        box-shadow: 2px 3px 7px 2px rgba(0,0,0,0.02);
+    }
+    a:link, a:visited {
+        color: #38488f;
+        text-decoration: none;
+    }
+    @media (max-width: 700px) {
+        div {
+            margin: 0 auto;
+            width: auto;
+        }
+    }
+    </style>    
+</head>
+
+<body>
+<div>
+    <h1>Example Domain</h1>
+    <p>This domain is for use in illustrative examples in documents. You may use this
+    domain in literature without prior coordination or asking for permission.</p>
+    <p><a href="https://www.iana.org/domains/example">More information...</a></p>
+</div>
+</body>
+</html>
+I, [2024-07-20T17:03:13.605159 #38509]  INFO -- : MintHttp Log (https://dashboard.moyasar.com)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619696.021 -> 619696.301 connecting: 0.28 total: 0.385 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_128_GCM_SHA256
+-> POST  HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: dashboard.moyasar.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 500 Internal Server Error
+<- Date: Sat, 20 Jul 2024 14:03:13 GMT
+<- Content-Type: text/plain; charset=utf-8
+<- Transfer-Encoding: chunked
+<- Connection: keep-alive
+<- X-Request-Id: b83bb0ba-f745-432f-bea8-37ab094afc3d
+<- X-Runtime: 0.003190
+<- Vary: Accept-Encoding
+<- Strict-Transport-Security: max-age=63072000; includeSubDomains
+<- Length: 182 Body: 500 Internal Server Error
+If you are the administrator of this website, then please read this web application's log file and/or the web server's log file to find out what went wrong.
+I, [2024-07-20T17:03:12.774798 #38509]  INFO -- : MintHttp Log (https://api.moyasar.com)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619695.17 -> 619695.469 connecting: 0.299 total: 0.406 seconds
+@@ TLS: TLSv1.2 Cipher: ECDHE-RSA-AES128-GCM-SHA256
+-> POST  HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: api.moyasar.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 404 Not Found
+<- Date: Sat, 20 Jul 2024 14:03:12 GMT
+<- Content-Type: application/json; charset=utf-8
+<- Content-Length: 91
+<- Connection: keep-alive
+<- X-Frame-Options: SAMEORIGIN
+<- X-Xss-Protection: 0
+<- X-Content-Type-Options: nosniff
+<- X-Download-Options: noopen
+<- X-Permitted-Cross-Domain-Policies: none
+<- Referrer-Policy: strict-origin-when-cross-origin
+<- X-Request-Id: 84cd8953-824a-4906-82ee-1a980d613dcf
+<- X-Runtime: 0.005813
+<- Strict-Transport-Security: max-age=63072000; includeSubDomains
+<- Vary: Origin
+<- Length: 91 Body: {
+  "type": "invalid_request_error",
+  "message": "Resource not found",
+  "errors": null
+}
+I, [2024-07-20T17:03:16.172324 #38509]  INFO -- : MintHttp Log (https://ipinfo.com/1.1.1.1)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619697.104 -> 619698.655 connecting: 1.551 total: 1.87 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_256_GCM_SHA384
+-> POST /1.1.1.1 HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: ipinfo.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 404 Not Found
+<- Date: Sat, 20 Jul 2024 14:03:16 GMT
+<- Server: Apache
+<- Content-Length: 315
+<- Content-Type: text/html; charset=iso-8859-1
+<- Length: 315 Body: <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL was not found on this server.</p>
+<p>Additionally, a 404 Not Found
+error was encountered while trying to use an ErrorDocument to handle the request.</p>
+</body></html>
+I, [2024-07-20T17:03:16.760845 #38509]  INFO -- : MintHttp Log (https://jsonplaceholder.typicode.com/todos)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619698.974 -> 619699.16 connecting: 0.186 total: 0.588 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_256_GCM_SHA384
+-> POST /todos HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: jsonplaceholder.typicode.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 201 Created
+<- Date: Sat, 20 Jul 2024 14:03:16 GMT
+<- Content-Type: application/json; charset=utf-8
+<- Content-Length: 31
+<- Connection: keep-alive
+<- Report-To: {"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1721484196&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=tM%2FBbHTq57%2BsNunb7rnddrY6QyUOMANVCb6RtLjfM1g%3D"}]}
+<- Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1721484196&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=tM%2FBbHTq57%2BsNunb7rnddrY6QyUOMANVCb6RtLjfM1g%3D
+<- Nel: {"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}
+<- X-Powered-By: Express
+<- X-Ratelimit-Limit: 1000
+<- X-Ratelimit-Remaining: 999
+<- X-Ratelimit-Reset: 1721484212
+<- Vary: Origin, X-HTTP-Method-Override, Accept-Encoding
+<- Access-Control-Allow-Credentials: true
+<- Cache-Control: no-cache
+<- Pragma: no-cache
+<- Expires: -1
+<- Access-Control-Expose-Headers: Location
+<- Location: https://jsonplaceholder.typicode.com/todos/201
+<- X-Content-Type-Options: nosniff
+<- Etag: W/"1f-v7q09ihdcrnA2mAxihAAQHEaYaQ"
+<- Via: 1.1 vegur
+<- Cf-Cache-Status: DYNAMIC
+<- Server: cloudflare
+<- Cf-Ray: 8a637e642d124c46-MXP
+<- Alt-Svc: h3=":443"; ma=86400
+<- Length: 31 Body: {
+  "foo": "bar",
+  "id": 201
+}
+I, [2024-07-20T17:03:13.218866 #38509]  INFO -- : MintHttp Log (https://api.moyasar.com/v1/payments)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619695.592 -> 619695.914 connecting: 0.322 total: 0.428 seconds
+@@ TLS: TLSv1.2 Cipher: ECDHE-RSA-AES128-GCM-SHA256
+-> POST /v1/payments HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: api.moyasar.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 401 Unauthorized
+<- Date: Sat, 20 Jul 2024 14:03:13 GMT
+<- Content-Type: application/json; charset=utf-8
+<- Content-Length: 91
+<- Connection: keep-alive
+<- X-Frame-Options: SAMEORIGIN
+<- X-Xss-Protection: 0
+<- X-Content-Type-Options: nosniff
+<- X-Download-Options: noopen
+<- X-Permitted-Cross-Domain-Policies: none
+<- Referrer-Policy: strict-origin-when-cross-origin
+<- Www-Authenticate: Basic realm="Application"
+<- Cache-Control: no-cache
+<- X-Request-Id: 77826288-0720-4b84-9c86-0079a2f79ab3
+<- X-Runtime: 0.004735
+<- Strict-Transport-Security: max-age=63072000; includeSubDomains
+<- Vary: Origin
+<- Length: 91 Body: {"type":"authentication_error","message":"Invalid authorization credentials","errors":null}
+I, [2024-07-20T17:03:17.220251 #38509]  INFO -- : MintHttp Log (https://jsonplaceholder.typicode.com/todos/1)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619699.563 -> 619699.731 connecting: 0.169 total: 0.459 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_256_GCM_SHA384
+-> POST /todos/1 HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: jsonplaceholder.typicode.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 404 Not Found
+<- Date: Sat, 20 Jul 2024 14:03:17 GMT
+<- Content-Type: application/json; charset=utf-8
+<- Content-Length: 2
+<- Connection: keep-alive
+<- Report-To: {"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1721484197&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=Jk6%2B0Z%2FbwSrMcljiDfaEWMOCwl2BpuLPEFla3gach%2B8%3D"}]}
+<- Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1721484197&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=Jk6%2B0Z%2FbwSrMcljiDfaEWMOCwl2BpuLPEFla3gach%2B8%3D
+<- Nel: {"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}
+<- X-Powered-By: Express
+<- X-Ratelimit-Limit: 1000
+<- X-Ratelimit-Remaining: 998
+<- X-Ratelimit-Reset: 1721484212
+<- Vary: Origin, X-HTTP-Method-Override, Accept-Encoding
+<- Access-Control-Allow-Credentials: true
+<- Cache-Control: no-cache
+<- Pragma: no-cache
+<- Expires: -1
+<- X-Content-Type-Options: nosniff
+<- Etag: W/"2-vyGp6PvFo4RvsFtPoIWeCReyIC8"
+<- Via: 1.1 vegur
+<- Cf-Cache-Status: DYNAMIC
+<- Server: cloudflare
+<- Cf-Ray: 8a637e67bd835a43-MXP
+<- Alt-Svc: h3=":443"; ma=86400
+<- Length: 2 Body: {}
+I, [2024-07-20T17:03:14.301120 #38509]  INFO -- : MintHttp Log (https://example.com)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619696.408 -> 619696.884 connecting: 0.476 total: 0.695 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_256_GCM_SHA384
+-> POST  HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: example.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 200 OK
+<- Accept-Ranges: bytes
+<- Cache-Control: max-age=604800
+<- Content-Type: text/html; charset=UTF-8
+<- Date: Sat, 20 Jul 2024 14:03:14 GMT
+<- Etag: "3147526947"
+<- Expires: Sat, 27 Jul 2024 14:03:14 GMT
+<- Last-Modified: Thu, 17 Oct 2019 07:18:26 GMT
+<- Server: EOS (vny/044F)
+<- Content-Length: 1256
+<- Length: 1256 Body: <!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type="text/css">
+    body {
+        background-color: #f0f0f2;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        
+    }
+    div {
+        width: 600px;
+        margin: 5em auto;
+        padding: 2em;
+        background-color: #fdfdff;
+        border-radius: 0.5em;
+        box-shadow: 2px 3px 7px 2px rgba(0,0,0,0.02);
+    }
+    a:link, a:visited {
+        color: #38488f;
+        text-decoration: none;
+    }
+    @media (max-width: 700px) {
+        div {
+            margin: 0 auto;
+            width: auto;
+        }
+    }
+    </style>    
+</head>
+
+<body>
+<div>
+    <h1>Example Domain</h1>
+    <p>This domain is for use in illustrative examples in documents. You may use this
+    domain in literature without prior coordination or asking for permission.</p>
+    <p><a href="https://www.iana.org/domains/example">More information...</a></p>
+</div>
+</body>
+</html>
+I, [2024-07-20T17:03:17.748015 #38509]  INFO -- : MintHttp Log (https://jsonplaceholder.typicode.com/posts/1)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619700.023 -> 619700.2 connecting: 0.177 total: 0.526 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_256_GCM_SHA384
+-> POST /posts/1 HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: jsonplaceholder.typicode.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 404 Not Found
+<- Date: Sat, 20 Jul 2024 14:03:17 GMT
+<- Content-Type: application/json; charset=utf-8
+<- Content-Length: 2
+<- Connection: keep-alive
+<- Report-To: {"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1721484197&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=Jk6%2B0Z%2FbwSrMcljiDfaEWMOCwl2BpuLPEFla3gach%2B8%3D"}]}
+<- Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1721484197&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=Jk6%2B0Z%2FbwSrMcljiDfaEWMOCwl2BpuLPEFla3gach%2B8%3D
+<- Nel: {"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}
+<- X-Powered-By: Express
+<- X-Ratelimit-Limit: 1000
+<- X-Ratelimit-Remaining: 997
+<- X-Ratelimit-Reset: 1721484212
+<- Vary: Origin, X-HTTP-Method-Override, Accept-Encoding
+<- Access-Control-Allow-Credentials: true
+<- Cache-Control: no-cache
+<- Pragma: no-cache
+<- Expires: -1
+<- X-Content-Type-Options: nosniff
+<- Etag: W/"2-vyGp6PvFo4RvsFtPoIWeCReyIC8"
+<- Via: 1.1 vegur
+<- Cf-Cache-Status: DYNAMIC
+<- Server: cloudflare
+<- Cf-Ray: 8a637e6aaac20d64-MXP
+<- Alt-Svc: h3=":443"; ma=86400
+<- Length: 2 Body: {}
+I, [2024-07-20T17:03:18.272730 #38509]  INFO -- : MintHttp Log (https://jsonplaceholder.typicode.com/posts)
+@@ Timeouts: 5, 5, 20
+@@ Time: 619700.551 -> 619700.725 connecting: 0.174 total: 0.523 seconds
+@@ TLS: TLSv1.3 Cipher: TLS_AES_256_GCM_SHA384
+-> POST /posts HTTP/1.1
+-> Accept-Encoding: gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+-> Accept: application/json
+-> User-Agent: Mint Http
+-> Host: jsonplaceholder.typicode.com
+-> Content-Type: application/json
+-> Content-Length: 13
+-> {"foo":"bar"}
+=======
+<- Response: HTTP/1.1 201 Created
+<- Date: Sat, 20 Jul 2024 14:03:18 GMT
+<- Content-Type: application/json; charset=utf-8
+<- Content-Length: 31
+<- Connection: keep-alive
+<- Report-To: {"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1721484198&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=dBxS26JOHwx7%2BNDSjKkei5MCYIR0VkgOLm9jUXNq4ZU%3D"}]}
+<- Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1721484198&sid=e11707d5-02a7-43ef-b45e-2cf4d2036f7d&s=dBxS26JOHwx7%2BNDSjKkei5MCYIR0VkgOLm9jUXNq4ZU%3D
+<- Nel: {"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}
+<- X-Powered-By: Express
+<- X-Ratelimit-Limit: 1000
+<- X-Ratelimit-Remaining: 996
+<- X-Ratelimit-Reset: 1721484212
+<- Vary: Origin, X-HTTP-Method-Override, Accept-Encoding
+<- Access-Control-Allow-Credentials: true
+<- Cache-Control: no-cache
+<- Pragma: no-cache
+<- Expires: -1
+<- Access-Control-Expose-Headers: Location
+<- Location: https://jsonplaceholder.typicode.com/posts/101
+<- X-Content-Type-Options: nosniff
+<- Etag: W/"1f-sBekL1M+V8GEMnkCGs539pAhjpU"
+<- Via: 1.1 vegur
+<- Cf-Cache-Status: DYNAMIC
+<- Server: cloudflare
+<- Cf-Ray: 8a637e6dff40bafd-MXP
+<- Alt-Svc: h3=":443"; ma=86400
+<- Length: 31 Body: {
+  "foo": "bar",
+  "id": 101
+}

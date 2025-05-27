@@ -67,7 +67,11 @@ class MintHttp::NetHttpFactory
     net_http.verify_hostname = options[:verify_hostname]
     net_http.min_version = options[:min_version]
     net_http.max_version = options[:max_version]
-    
+
+    # Keep-alive Options
+    # Keep-alive timeout is made 1 month to allow maximum connection time
+    # since persistent connection management is handled by MintHttp::Pool
+    net_http.keep_alive_timeout = 2_592_000
 
     if OpenSSL::X509::Store === options[:ca]
       net_http.cert_store = options[:ca]

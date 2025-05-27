@@ -16,7 +16,6 @@ class MintHttp::PoolEntry
     @birth_time = time_ms
     @last_used = time_ms
     @usage = 0
-    @unhealthy = false
   end
 
   def matches?(other)
@@ -50,18 +49,20 @@ class MintHttp::PoolEntry
   end
 
   def available?
-    !@acquired && !expired? && !@unhealthy
+    !@acquired && !expired? && healthy?
   end
 
   def healthy?
-    # TODO: add health check
-    healthy = true
-    @unhealthy = !healthy
-    healthy
+    socket = client.underlying_tcp_socket
+    unless socket
+      return false
+    end
+
+    !socket.closed? && !(socket.wait_readable(0) && client.buffered_socket.eof?)
   end
 
   def to_clean?
-    (expired? || @unhealthy) && !@acquired
+    (expired? || !healthy?) && !@acquired
   end
 
   private
