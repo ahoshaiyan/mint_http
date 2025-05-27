@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.1.2] - 2025-05-27
+
+- Log local and remote addresses
+
 ## [1.0.1] - 2025-05-26
 
 - Add SSL min and max version support

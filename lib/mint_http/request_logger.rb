@@ -137,7 +137,7 @@ module MintHttp
       end
 
       socket = http.underlying_tcp_socket
-      if socket
+      if socket && socket.is_a?(TCPSocket)
         @local_address = socket.local_address
         @remote_address = socket.remote_address
       end
