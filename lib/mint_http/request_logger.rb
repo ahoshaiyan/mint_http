@@ -15,6 +15,8 @@ module MintHttp
     attr_reader :time_total
     attr_reader :time_connecting
     attr_reader :tls_config
+    attr_reader :local_address
+    attr_reader :remote_address
 
     # @param [Logger] logger
     # @param [Array[String|Symbol]] request
@@ -79,12 +81,25 @@ module MintHttp
         tls = "#{@tls_config[:version]} Cipher: #{@tls_config[:cipher]}"
       end
 
+      local_address = if @local_address
+        "#{@local_address.ip_address}:#{@local_address.ip_port}"
+      else
+        'N/A'
+      end
+
+      remote_address = if @remote_address
+        "#{@remote_address.ip_address}:#{@remote_address.ip_port}"
+      else
+        'N/A'
+      end
+
       buffer = String.new(encoding: 'UTF-8')
       buffer << <<~TXT
         MintHttp Log (#{@request.request_url})
         @@ Timeouts: #{@request.open_timeout}, #{@request.write_timeout}, #{@request.read_timeout}
         @@ Time: #{@time_started.round(3)} -> #{@time_connected.round(3)} connecting: #{time_connecting.round(3)} total: #{@time_total.round(3)} seconds
         @@ TLS: #{tls}
+        @@ Address: #{local_address} -> #{remote_address}
         -> #{@request.method.upcase} #{path} HTTP/#{version}
         #{masked_headers(@net_request.each_header.to_h, '-> ')}
         -> #{masked_body(@net_request.body, @request.headers['content-type'])}
@@ -119,6 +134,12 @@ module MintHttp
         else
           nil
         end
+      end
+
+      socket = http.underlying_tcp_socket
+      if socket
+        @local_address = socket.local_address
+        @remote_address = socket.remote_address
       end
     end
 
