@@ -54,7 +54,7 @@ class MintHttp::PoolEntry
 
   def healthy?
     socket = client.underlying_tcp_socket
-    unless socket
+    unless socket.is_a?(TCPSocket)
       return false
     end
 
