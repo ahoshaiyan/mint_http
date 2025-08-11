@@ -110,7 +110,7 @@ module MintHttp
         buffer << <<~TXT
           <- Response: HTTP/#{@response.version} #{@response.status_code} #{@response.status_text}
           #{masked_headers(@response.headers, '<- ')}
-          <- Length: #{@response.body.bytesize} Body: #{masked_body(@response.body, @response.headers['content-type'])}
+          <- Length: #{@response.body&.bytesize || 0} Body: #{masked_body(@response.body, @response.headers['content-type'])}
         TXT
       end
 
