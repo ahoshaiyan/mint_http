@@ -37,9 +37,7 @@ class MintHttp::Pool
           return entry.client
         end
 
-        if @pool.length > 0 && @pool.all? { |e| e.to_clean? }
-          clean_pool_unsafe!
-        end
+        clean_pool_unsafe! if @pool.any? { |e| e.to_clean? }
 
         if @pool.length < @size
           client = net_factory.make_client(hostname, port, options)

@@ -46,6 +46,7 @@ class MintHttp::PoolEntry
 
   def release!
     @acquired = false
+    @last_used = time_ms
   end
 
   def available?
