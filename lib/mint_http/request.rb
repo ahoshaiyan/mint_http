@@ -9,6 +9,20 @@ require 'resolv'
 
 module MintHttp
   class Request
+    # Raised when a connection we took from the pool turns out to have been
+    # closed by the peer. The request never reached the server, so replaying it
+    # on a fresh connection is safe.
+    STALE_CONNECTION_ERRORS = [
+      EOFError,
+      Errno::ECONNABORTED,
+      Errno::ECONNRESET,
+      Errno::EPIPE,
+      Net::HTTPBadResponse,
+    ].freeze
+
+    # Methods that can be replayed without the server observing them twice.
+    IDEMPOTENT_METHODS = %w[get head put delete].freeze
+
     attr_reader :base_url
     attr_reader :headers
     attr_reader :body_type
@@ -321,12 +335,17 @@ module MintHttp
 
     rescue Errno::ECONNREFUSED => e
       raise ConnectionRefusedError, e.message
-    rescue Errno::ECONNRESET => e
+    rescue Errno::ECONNRESET, Errno::ENETRESET => e
       raise ConnectionResetError, e.message
+    rescue Errno::ECONNABORTED => e
+      raise ConnectionAbortedError, e.message
 
-    rescue IOError, EOFError, Errno::EPIPE, Errno::EIO => e
+    # A malformed status line is how a desynced keep-alive connection presents
+    # itself: we are reading the tail of somebody else's response.
+    rescue IOError, EOFError, Errno::EPIPE, Errno::EIO, Net::HTTPBadResponse => e
       raise ConnectionIoError, e.message
-    rescue Errno::EHOSTUNREACH, Errno::ENETUNREACH => e
+    rescue Errno::EHOSTUNREACH, Errno::ENETUNREACH, Errno::EHOSTDOWN,
+           Errno::ENETDOWN, Errno::ETIMEDOUT, Errno::EADDRNOTAVAIL => e
       raise ConnectionError, e.message
 
     rescue OpenSSL::SSL::SSLError => e
@@ -435,24 +454,52 @@ module MintHttp
     def with_client(hostname, port, options = {})
       raise ArgumentError, 'Block is required' unless block_given?
 
-      # Get client from pool
-      net_http = @pool&.acquire(hostname, port, options)
-
-      # make a new client if there is no pool
-      unless net_http
-        net_http = net_factory.make_client(hostname, port, options)
-      end
+      attempts = 0
+      reused = false
 
       begin
-        net_http.start unless net_http.started?
-        yield(net_http)
-      ensure
-        if @pool
-          @pool.release(net_http)
-        else
-          net_http.finish if net_http.started?
+        reused = false
+
+        # Get client from pool
+        net_http = @pool&.acquire(hostname, port, options)
+
+        # make a new client if there is no pool
+        unless net_http
+          net_http = net_factory.make_client(hostname, port, options)
         end
+
+        # An already-started client came out of the pool, so it is carrying a
+        # connection that some earlier request left open.
+        reused = net_http.started?
+
+        begin
+          net_http.start unless net_http.started?
+          yield(net_http)
+        ensure
+          if @pool
+            @pool.release(net_http)
+          else
+            net_http.finish if net_http.started?
+          end
+        end
+      rescue *STALE_CONNECTION_ERRORS
+        attempts += 1
+
+        # Only a reused connection can be stale, and only once: a fresh
+        # connection failing this way is a real network fault, not a race.
+        raise unless reused && attempts == 1 && replayable?
+
+        retry
       end
+    end
+
+    # A request may only be replayed when the server would not observe it twice
+    # and when its body can actually be rebuilt. Net::HTTP re-encodes a multipart
+    # body from the source IOs on every exec, and those IOs sit at EOF after the
+    # first attempt -- the replay would silently ship a truncated body with a
+    # matching Content-Length, and the server would accept it.
+    def replayable?
+      IDEMPOTENT_METHODS.include?(@method.to_s) && @files.empty?
     end
 
     def net_factory

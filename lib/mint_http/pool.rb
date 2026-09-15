@@ -27,6 +27,9 @@ class MintHttp::Pool
   end
 
   def acquire(hostname, port, options = {})
+    # Let Net::HTTP expire an idle connection on the same schedule the pool does.
+    options = options.merge(keep_alive_timeout: @idle_ttl / 1000.0)
+
     namespace = net_factory.client_namespace(hostname, port, options)
     deadline = time_ms + @timeout
 
@@ -37,9 +40,7 @@ class MintHttp::Pool
           return entry.client
         end
 
-        if @pool.length > 0 && @pool.all? { |e| e.to_clean? }
-          clean_pool_unsafe!
-        end
+        clean_pool_unsafe! if @pool.any? { |e| e.to_clean? }
 
         if @pool.length < @size
           client = net_factory.make_client(hostname, port, options)
@@ -59,7 +60,7 @@ class MintHttp::Pool
       sleep(sleep_time)
     end
 
-    raise RuntimeError, "Cannot acquire lock after #{@timeout}ms."
+    raise MintHttp::PoolTimeoutError, "Cannot acquire a connection after #{@timeout}ms."
   end
 
   def release(client)

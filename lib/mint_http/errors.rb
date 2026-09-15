@@ -32,6 +32,10 @@ module MintHttp
   # OpenSSL::SSL::SSLError
   class ConnectionSslError < ConnectionError; end
 
+  # The pool could not hand out a connection within its :timeout. Not a network
+  # fault -- the pool is saturated or full of connections still in flight.
+  class PoolTimeoutError < Error; end
+
   class TimeoutError < Error; end
   class ReadTimeoutError < TimeoutError; end
   class WriteTimeoutError < TimeoutError; end
