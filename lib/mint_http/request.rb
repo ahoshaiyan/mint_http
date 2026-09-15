@@ -335,12 +335,17 @@ module MintHttp
 
     rescue Errno::ECONNREFUSED => e
       raise ConnectionRefusedError, e.message
-    rescue Errno::ECONNRESET => e
+    rescue Errno::ECONNRESET, Errno::ENETRESET => e
       raise ConnectionResetError, e.message
+    rescue Errno::ECONNABORTED => e
+      raise ConnectionAbortedError, e.message
 
-    rescue IOError, EOFError, Errno::EPIPE, Errno::EIO => e
+    # A malformed status line is how a desynced keep-alive connection presents
+    # itself: we are reading the tail of somebody else's response.
+    rescue IOError, EOFError, Errno::EPIPE, Errno::EIO, Net::HTTPBadResponse => e
       raise ConnectionIoError, e.message
-    rescue Errno::EHOSTUNREACH, Errno::ENETUNREACH => e
+    rescue Errno::EHOSTUNREACH, Errno::ENETUNREACH, Errno::EHOSTDOWN,
+           Errno::ENETDOWN, Errno::ETIMEDOUT, Errno::EADDRNOTAVAIL => e
       raise ConnectionError, e.message
 
     rescue OpenSSL::SSL::SSLError => e

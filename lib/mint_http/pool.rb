@@ -60,7 +60,7 @@ class MintHttp::Pool
       sleep(sleep_time)
     end
 
-    raise RuntimeError, "Cannot acquire lock after #{@timeout}ms."
+    raise MintHttp::PoolTimeoutError, "Cannot acquire a connection after #{@timeout}ms."
   end
 
   def release(client)
