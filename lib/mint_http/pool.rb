@@ -27,6 +27,9 @@ class MintHttp::Pool
   end
 
   def acquire(hostname, port, options = {})
+    # Let Net::HTTP expire an idle connection on the same schedule the pool does.
+    options = options.merge(keep_alive_timeout: @idle_ttl / 1000.0)
+
     namespace = net_factory.client_namespace(hostname, port, options)
     deadline = time_ms + @timeout
 

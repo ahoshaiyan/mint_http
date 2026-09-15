@@ -6,6 +6,7 @@ class MintHttp::NetHttpFactory
     options[:write_timeout] = options[:write_timeout] || 5
     options[:read_timeout] = options[:read_timeout] || 20
     options[:ssl_timeout] = options[:ssl_timeout] || 5
+    options[:keep_alive_timeout] = options[:keep_alive_timeout] || 30
     options[:verify_mode] = options[:verify_mode] || OpenSSL::SSL::VERIFY_PEER
     options[:verify_hostname] = options[:verify_hostname] || true
     options
@@ -16,7 +17,7 @@ class MintHttp::NetHttpFactory
 
     host_group = "#{hostname.downcase}_#{port.to_s.downcase}"
     proxy_group = "#{options[:proxy_address]}_#{options[:proxy_port]}_#{options[:proxy_user]}"
-    timeout_group = "#{options[:open_timeout]}_#{options[:write_timeout]}_#{options[:read_timeout]}"
+    timeout_group = "#{options[:open_timeout]}_#{options[:write_timeout]}_#{options[:read_timeout]}_#{options[:keep_alive_timeout]}"
 
     cert_signature = options[:cert]&.serial&.to_s
     key_signature = OpenSSL::Digest::SHA1.new(options[:key]&.to_der || '').to_s
@@ -44,7 +45,10 @@ class MintHttp::NetHttpFactory
 
     net_http = Net::HTTP.new(hostname, port, nil)
 
-    # Disable retries
+    # Disable Net::HTTP's own retries. Its retry list includes Net::ReadTimeout,
+    # so a retry would double the worst-case latency of a genuinely slow request.
+    # Stale pooled connections are retried by Request#with_client instead, which
+    # can tell a dead connection apart from a slow server.
     net_http.max_retries = 0
 
     # Set proxy options
@@ -69,9 +73,11 @@ class MintHttp::NetHttpFactory
     net_http.max_version = options[:max_version]
 
     # Keep-alive Options
-    # Keep-alive timeout is made 1 month to allow maximum connection time
-    # since persistent connection management is handled by MintHttp::Pool
-    net_http.keep_alive_timeout = 2_592_000
+    # Net::HTTP drops and reopens a connection that has sat idle longer than
+    # this. It is the last guard against writing a request into a connection the
+    # peer has already dropped without telling us. MintHttp::Pool derives it from
+    # its own :idle_ttl so the two layers agree on when a connection is too old.
+    net_http.keep_alive_timeout = options[:keep_alive_timeout]
 
     if OpenSSL::X509::Store === options[:ca]
       net_http.cert_store = options[:ca]
