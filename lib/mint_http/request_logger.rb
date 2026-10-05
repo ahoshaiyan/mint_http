@@ -22,7 +22,7 @@ module MintHttp
     # @param [Array[String|Symbol]] request
     def initialize(logger, filter_list, filter = true)
       @logger = logger
-      @filter_list = filter_list.map(&:downcase)
+      @filter_list = filter_list.map { |param| param.to_s.downcase }.uniq
       @filter = filter
       @time_started = 0.0
       @time_ended = 0.0
@@ -32,13 +32,29 @@ module MintHttp
 
       @request = nil
       @net_request = nil
+      @url = nil
+      @method = nil
       @response = nil
       @error = nil
+      @retried_after = nil
+      @retry_error = nil
     end
 
-    def log_request(request, net_request)
+    # The URL and method are kept here since a Request object may be shared between threads.
+    def log_request(request, net_request, url = request.request_url, method = request.method)
       @request = request
       @net_request = net_request
+      @url = url
+      @method = method
+    end
+
+    # A request was sent once more after a stale keep-alive connection failed with error
+    def log_retry(error)
+      @retried_after = error
+    end
+
+    def log_retry_error(error)
+      @retry_error = error
     end
 
     def log_response(response)
@@ -72,8 +88,23 @@ module MintHttp
       response.time_connecting = @time_connecting
     end
 
+    # Logging must never fail a request: any error here is reported as a warning only.
+    # Interrupts (e.g. Rack::Timeout) are deferred until the log is written so that rescue
+    # cannot swallow them.
     def write_log
-      path = build_path(@request.request_url)
+      Thread.handle_interrupt(Object => :never) { build_and_write_log }
+    end
+
+    def log_connection_info(http)
+      Thread.handle_interrupt(Object => :never) { read_connection_info(http) }
+    end
+
+    private
+
+    def build_and_write_log
+      return if discarding_logger?
+
+      path = build_path(@url)
       version = @response&.version || '1.1'
 
       tls = 'None'
@@ -95,12 +126,12 @@ module MintHttp
 
       buffer = String.new(encoding: 'UTF-8')
       buffer << <<~TXT
-        MintHttp Log (#{@request.request_url})
+        MintHttp Log (#{loggable_url(@url)})
         @@ Timeouts: #{@request.open_timeout}, #{@request.write_timeout}, #{@request.read_timeout}
         @@ Time: #{@time_started.round(3)} -> #{@time_connected.round(3)} connecting: #{time_connecting.round(3)} total: #{@time_total.round(3)} seconds
         @@ TLS: #{tls}
         @@ Address: #{local_address} -> #{remote_address}
-        -> #{@request.method.upcase} #{path} HTTP/#{version}
+        -> #{@method.upcase} #{path} HTTP/#{version}
         #{masked_headers(@net_request.each_header.to_h, '-> ')}
         -> #{masked_body(@net_request.body, @request.headers['content-type'])}
         =======
@@ -108,26 +139,30 @@ module MintHttp
 
       if @response
         buffer << <<~TXT
-          <- Response: HTTP/#{@response.version} #{@response.status_code} #{@response.status_text}
+          <- Response: HTTP/#{@response.version} #{@response.status_code} #{utf8(@response.status_text)}
           #{masked_headers(@response.headers, '<- ')}
           <- Length: #{@response.body&.bytesize || 0} Body: #{masked_body(@response.body, @response.headers['content-type'])}
         TXT
       end
 
+      if @retried_after
+        buffer << "!! Retried on a new connection after: #{@retried_after.class}, message: #{utf8(@retried_after.message)}\n"
+      end
+
+      if @retry_error
+        buffer << "!! Retry failed: #{@retry_error.class}, message: #{utf8(@retry_error.message)}\n"
+      end
+
       if @error
-        buffer << "!! Error: #{@error.class}, message: #{@error.message}"
+        buffer << "!! Error: #{@error.class}, message: #{utf8(@error.message)}"
       end
 
-      unless buffer.valid_encoding?
-        raise 'Buffer has not valid encoding'
-      end
-
-      @logger.info(buffer.strip)
-    rescue Encoding::CompatibilityError => e
-      @logger.warn(e)
+      @logger.info(buffer.scrub('?').strip)
+    rescue StandardError => e
+      @logger.warn("MintHttp failed to write request log: #{e.class}: #{e.message}") rescue nil
     end
 
-    def log_connection_info(http)
+    def read_connection_info(http)
       @tls_config = http.instance_eval do
         if use_ssl?
           { version: @socket.io.ssl_version, cipher: @socket.io.cipher[0] }
@@ -141,19 +176,37 @@ module MintHttp
         @local_address = socket.local_address
         @remote_address = socket.remote_address
       end
+    rescue StandardError
+      # e.g. Errno::ENOTCONN when the peer already reset the connection
+      nil
     end
 
-    private
+    # Nothing would be written: no logger, a level above INFO, or a plain Logger writing
+    # nowhere such as the default Logger.new('/dev/null')
+    def discarding_logger?
+      return true if @logger.nil?
+      return true if @logger.respond_to?(:info?) && !@logger.info?
+      return false unless @logger.instance_of?(::Logger)
+
+      logdev = @logger.instance_variable_get(:@logdev)
+      logdev.nil? || (logdev.respond_to?(:filename) && logdev.filename == File::NULL)
+    end
 
     def clock_time
       Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
+
+    def loggable_url(url)
+      return url.to_s unless url.query
+
+      "#{url.to_s.split('?', 2).first}?#{filter_query(url.query)}"
     end
 
     def build_path(url)
       full_path = url.path.dup
 
       if url.query
-        full_path << "?#{url.query}"
+        full_path << "?#{filter_query(url.query)}"
       end
 
       if url.fragment
@@ -172,17 +225,28 @@ module MintHttp
         return query
       end
 
-      filtered = CGI::parse(query || '')
-        .to_h { |k, v| [k, lower_case_filter_list.include?(v) ? '[FILTERED]' : v] }
-
-      URI.encode_www_form(filtered)
+      URI.decode_www_form(query.to_s).map do |k, v|
+        value = filtered_key?(k) ? '[FILTERED]' : URI.encode_www_form_component(v)
+        "#{URI.encode_www_form_component(k)}=#{value}"
+      end.join('&')
+    rescue ArgumentError
+      '[FILTERED]'
     end
 
     def masked_headers(headers, prefix = '')
       headers
         .map { |k, v| [k.split('-').map(&:capitalize).join('-'), v] }
-        .map { |k, v| "#{prefix}#{k}: #{@filter && lower_case_filter_list.include?(k.downcase) ? '[FILTERED]' : v}" }
+        .map { |k, v| "#{prefix}#{k}: #{@filter && lower_case_filter_list.include?(k.downcase) ? '[FILTERED]' : utf8(v)}" }
         .join("\n")
+    end
+
+    # Matches plain keys and each part of bracketed keys such as source[number]
+    def filtered_key?(key)
+      key.downcase.scan(/[^\[\]]+/).any? { |part| lower_case_filter_list.include?(part) }
+    end
+
+    def utf8(value)
+      value.to_s.dup.force_encoding(Encoding::UTF_8).scrub('?')
     end
 
     def masked_body(body, type)
@@ -201,8 +265,9 @@ module MintHttp
         return '[COMPLEX]'
       end
 
-      # Force encoding to UTF-8 to allow logging
-      body = body.dup.force_encoding('utf-8')
+      unless (body = loggable_text(body, type))
+        return "[BINARY #{size} bytes]"
+      end
 
       unless @filter
         return body
@@ -212,9 +277,31 @@ module MintHttp
         redact_json(body)
       elsif type.match?(/xml/)
         redact_xml(body)
+      elsif type.match?(/x-www-form-urlencoded/)
+        filter_query(body)
       else
         body
       end
+    end
+
+    # Returns the body as valid UTF-8 (transcoded from its declared charset), or nil when
+    # it is not text.
+    def loggable_text(body, type)
+      charset = type[/charset\s*=\s*"?([^";\s]+)/i, 1]
+      encoding = Encoding.find(charset) rescue nil if charset
+
+      [encoding, Encoding::UTF_8].compact.uniq.each do |candidate|
+        next if candidate == Encoding::BINARY
+
+        text = body.dup.force_encoding(candidate)
+        next unless text.valid_encoding?
+
+        return candidate == Encoding::UTF_8 ? text : text.encode(Encoding::UTF_8)
+      rescue EncodingError
+        next
+      end
+
+      nil
     end
 
     def body_allowed?(content_type)

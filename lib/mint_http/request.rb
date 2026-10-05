@@ -9,6 +9,16 @@ require 'resolv'
 
 module MintHttp
   class Request
+    # Errors raised when a reused keep-alive connection turns out to have been closed by
+    # the server while it was idle in the pool.
+    STALE_CONNECTION_ERRORS = [EOFError, Errno::ECONNRESET, Errno::EPIPE, Errno::ECONNABORTED, Errno::EPROTOTYPE].freeze
+
+    # Methods that are safe to send again (RFC 9110 safe methods). Other requests, such as
+    # POST, may have been processed by the server and are only retried when they carry an
+    # idempotency key the server uses to deduplicate them.
+    RETRYABLE_METHODS = %w[GET HEAD OPTIONS].freeze
+    IDEMPOTENCY_KEY_HEADERS = %w[idempotency-key x-idempotency-key].freeze
+
     attr_reader :base_url
     attr_reader :headers
     attr_reader :body_type
@@ -52,6 +62,7 @@ module MintHttp
       @ssl_verify_hostname = nil
       @ssl_min_version = nil
       @ssl_max_version = nil
+      @raise_on_truncated_body = false
 
       @logger = MintHttp.config.logger
       @filter_params_list = MintHttp.config.filter_params_list
@@ -90,6 +101,13 @@ module MintHttp
 
     def ssl_verify_hostname(verify)
       @ssl_verify_hostname = verify
+      self
+    end
+
+    # Raise MintHttp::ProtocolError when the connection closes before the whole response
+    # body arrived, instead of returning the truncated body.
+    def raise_on_truncated_body(raise_error = true)
+      @raise_on_truncated_body = raise_error
       self
     end
 
@@ -234,9 +252,13 @@ module MintHttp
       self
     end
 
+    # Filtered params apply to every request: they are added to MintHttp.config.filter_params_list.
     # @param [Array[String]] params
     def filter_param(*params)
-      @filter_params_list.concat(params)
+      params.each do |param|
+        @filter_params_list << param unless @filter_params_list.any? { |p| p.to_s == param.to_s }
+      end
+
       self
     end
 
@@ -279,18 +301,13 @@ module MintHttp
       logger = RequestLogger.new(@logger, @filter_params_list, @filter_params)
       url, net_request, options = build_request(method, url)
 
-      logger.log_request(self, net_request)
+      logger.log_request(self, net_request, url, method)
       logger.log_start
 
       begin
-        response = with_client(url.hostname, url.port, options) do |http|
-          logger.log_connected
-          logger.log_connection_info(http)
-          net_response = http.request(net_request)
-
-          Response.new(net_response, net_request, self, http)
-        end
-      rescue StandardError => error
+        response = perform_request(url, net_request, options, logger)
+      rescue Exception => error
+        # Also log interrupts (Timeout.timeout, Thread#raise) so aborted calls leave a trace
         logger.log_end
         logger.log_error(error)
         logger.write_log
@@ -334,6 +351,58 @@ module MintHttp
     end
 
     private
+
+    def perform_request(url, net_request, options, logger)
+      with_client(url.hostname, url.port, options) do |http, reused|
+        logger.log_connected
+        logger.log_connection_info(http)
+        net_response = request_with_stale_retry(http, net_request, reused, logger)
+
+        Response.new(net_response, net_request, self, http)
+      end
+    end
+
+    # With MintHttp::Pool.new(retry_stale: true), a reused keep-alive connection that the
+    # server closed while idle fails before any response byte arrives: when the request is
+    # safe to send again, it is sent once more on a new connection. Should that fail too,
+    # the first error is raised since the request may have reached the server.
+    def request_with_stale_retry(http, net_request, reused, logger)
+      response_started = false
+
+      begin
+        http.request(net_request) { response_started = true }
+      rescue *STALE_CONNECTION_ERRORS, OpenSSL::SSL::SSLError => error
+        if response_started && @raise_on_truncated_body
+          raise ProtocolError, "Incomplete response: #{error.message}"
+        end
+
+        raise unless reused && !response_started && @pool&.retry_stale && retry_stale_connection?(net_request, error)
+
+        logger.log_retry(error)
+        close_client(http)
+
+        begin
+          http.start
+          logger.log_connection_info(http)
+          http.request(net_request)
+        rescue StandardError => retry_error
+          logger.log_retry_error(retry_error)
+          raise error, cause: nil
+        end
+      end
+    end
+
+    def retry_stale_connection?(net_request, error)
+      replayable = RETRYABLE_METHODS.include?(net_request.method) ||
+        IDEMPOTENCY_KEY_HEADERS.any? { |header| net_request.key?(header) }
+      return false unless replayable
+
+      # Uploaded files and body streams were consumed by the first attempt
+      return false unless @files.empty? && net_request.body_stream.nil?
+
+      # TLS connections closed without close_notify fail with "unexpected eof while reading"
+      !error.is_a?(OpenSSL::SSL::SSLError) || error.message.match?(/eof/i)
+    end
 
     def build_url(url)
       url = URI.parse(url)
@@ -427,32 +496,48 @@ module MintHttp
         verify_hostname: @ssl_verify_hostname,
         min_version: @ssl_min_version,
         max_version: @ssl_max_version,
+        raise_on_truncated_body: @raise_on_truncated_body,
       }
 
       [url, net_request, options]
     end
 
+    # Yields a started client and whether it is a reused keep-alive connection.
     def with_client(hostname, port, options = {})
       raise ArgumentError, 'Block is required' unless block_given?
 
-      # Get client from pool
-      net_http = @pool&.acquire(hostname, port, options)
-
-      # make a new client if there is no pool
-      unless net_http
-        net_http = net_factory.make_client(hostname, port, options)
-      end
+      net_http = nil
+      completed = false
 
       begin
-        net_http.start unless net_http.started?
-        yield(net_http)
+        # Get client from pool, make a new client if there is no pool
+        net_http = @pool ? @pool.checkout(hostname, port, options) : net_factory.make_client(hostname, port, options)
+
+        reused = net_http.started?
+        net_http.start unless reused
+
+        result = yield(net_http, reused)
+        completed = true
+        result
       ensure
-        if @pool
-          @pool.release(net_http)
-        else
-          net_http.finish if net_http.started?
+        # Interrupts (Timeout.timeout, Thread#raise) are deferred while the connection is
+        # returned so its pool slot cannot leak. Should one land before this point, the pool
+        # reclaims the slot (see MintHttp::PoolEntry#leaked?).
+        Thread.handle_interrupt(Object => :never) do
+          if net_http
+            # A request that did not complete leaves the connection in an unknown state
+            # (e.g. its response still unread), so it must never be handed out again.
+            close_client(net_http) if !@pool || !completed
+            @pool&.release(net_http)
+          end
         end
       end
+    end
+
+    def close_client(net_http)
+      net_http.finish if net_http.started?
+    rescue StandardError
+      nil
     end
 
     def net_factory
