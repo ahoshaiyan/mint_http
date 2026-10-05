@@ -71,9 +71,7 @@ module MintHttp
       @status_text = net_response.message
       @headers = Headers.new.merge(net_response.each_header.to_h)
 
-      tcp_socket = net_http.underlying_tcp_socket
-      @local_address = tcp_socket.local_address rescue nil
-      @remote_address = tcp_socket.remote_address rescue nil
+      @local_address, @remote_address = net_http.connection_addresses
     end
 
     def success?

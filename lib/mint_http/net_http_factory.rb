@@ -15,12 +15,13 @@ class MintHttp::NetHttpFactory
     options = defaults(options)
 
     host_group = "#{hostname.downcase}_#{port.to_s.downcase}"
-    proxy_group = "#{options[:proxy_address]}_#{options[:proxy_port]}_#{options[:proxy_user]}"
+    proxy_group = "#{options[:proxy_address]}_#{options[:proxy_port]}_#{options[:proxy_user]}_#{digest(options[:proxy_pass])}"
     timeout_group = "#{options[:open_timeout]}_#{options[:write_timeout]}_#{options[:read_timeout]}"
 
-    cert_signature = options[:cert]&.serial&.to_s
-    key_signature = OpenSSL::Digest::SHA1.new(options[:key]&.to_der || '').to_s
-    ssl_group = "#{options[:use_ssl]}_#{options[:ssl_timeout]}_#{options[:ca_file]}_#{cert_signature}_#{key_signature}_#{options[:verify_mode]}_#{options[:verify_hostname]}"
+    ca_signature = OpenSSL::X509::Store === options[:ca] ? "store:#{options[:ca].object_id}" : options[:ca].to_s
+    cert_signature = digest(options[:cert]&.to_der)
+    key_signature = digest(options[:key]&.to_der)
+    ssl_group = "#{options[:use_ssl]}_#{options[:ssl_timeout]}_#{ca_signature}_#{cert_signature}_#{key_signature}_#{options[:verify_mode]}_#{options[:verify_hostname]}_#{options[:min_version]}_#{options[:max_version]}_#{options[:raise_on_truncated_body]}"
 
     "#{host_group}_#{proxy_group}_#{timeout_group}_#{ssl_group}"
   end
@@ -44,8 +45,12 @@ class MintHttp::NetHttpFactory
 
     net_http = Net::HTTP.new(hostname, port, nil)
 
-    # Disable retries
+    # Disable retries, MintHttp::Request retries stale connections itself
     net_http.max_retries = 0
+
+    # When false, EOFError is raised if the connection closes before Content-Length bytes
+    # are read instead of returning a truncated body
+    net_http.ignore_eof = !options[:raise_on_truncated_body]
 
     # Set proxy options
     net_http.proxy_address = options[:proxy_address]
@@ -80,5 +85,11 @@ class MintHttp::NetHttpFactory
     end
 
     net_http
+  end
+
+  private
+
+  def digest(value)
+    value ? OpenSSL::Digest::SHA256.hexdigest(value.to_s) : ''
   end
 end

@@ -155,7 +155,7 @@ a pool, simply do the following:
 ```ruby
 pool = MintHttp::Pool.new({
   ttl: 30_000,
-  idle_ttl: 10_000,
+  idle_ttl: 4_000,
   size: 10,
   usage_limit: 500,
   timeout: 500,
@@ -165,9 +165,21 @@ pool = MintHttp::Pool.new({
 This will create a new pool with the following properties:
 
 - Allow a connection to be open for a maximum of 30 seconds defined by `ttl`.
-- If a connection is not used within 10 seconds of the last use then it is considered expired, defined by `idle_ttl`.
-- Only hold a maximum of 10 connections, if an 11th thread tries to acquire a connection, it will block until there is one available or timeout is reached.
+- If a connection is not used within 4 seconds of the last use then it is considered expired, defined by `idle_ttl` (default 5 seconds).
+- Only hold a maximum of 10 connections, if an 11th thread tries to acquire a connection, it will block until there is one available or timeout is reached. Idle connections to other hosts are closed to make room. When the timeout is reached `MintHttp::PoolTimeoutError` (a `RuntimeError`) is raised and the request is not sent.
 - A connection may be only used for 500 requests, then it should be closed. This is defined by `usage_limit`.
+
+> Note: keep `idle_ttl` lower than the keep-alive timeout of the servers you call (5 seconds for Node.js and Apache,
+> 60 seconds for AWS ALB, 75 seconds for nginx). Otherwise the server may close a connection just as MintHttp reuses it,
+> and the request fails with a `MintHttp::ConnectionError`.
+
+To retry those failures, create the pool with `retry_stale: true`. A request that fails on a reused connection before
+any response byte arrived is then sent once more on a new connection, but only when it is safe to send again: `GET`,
+`HEAD` and `OPTIONS` requests, or requests carrying an `Idempotency-Key` (or `X-Idempotency-Key`) header.
+
+```ruby
+pool = MintHttp::Pool.new({ idle_ttl: 4_000, retry_stale: true })
+```
 
 Once you have created a pool, you can use it in your requests as following:
 
@@ -182,7 +194,11 @@ scheme, client certificate, proxy, and other variables.
 
 > Note: it is possible to use only a single pool for the entire application.
 
-> Note: The Pool object is thread-safe
+> Note: The Pool object is thread-safe and fork-safe: connections inherited from a parent process are discarded.
+
+> Note: A request interrupted by `Timeout.timeout`, `Thread#raise` or similar never returns its connection to the
+> pool, so the next request cannot receive the interrupted request's response. Requests respect the caller's
+> `Thread.handle_interrupt` mask.
 
 
 ## The Response Object
@@ -194,6 +210,13 @@ Otherwise the same response object is returned.
 
 ```ruby
 MintHttp.get('https://example.com').raise!
+```
+
+When the connection closes before the whole body arrived, the truncated body is returned. Chain `raise_on_truncated_body`
+to raise `MintHttp::ProtocolError` instead:
+
+```ruby
+MintHttp.raise_on_truncated_body.get('https://example.com')
 ```
 
 

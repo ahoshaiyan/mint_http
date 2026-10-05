@@ -20,7 +20,11 @@ class TestPoolTimeoutTest < Minitest::Test
         Thread.new do
           while alive
             begin
-              client.gets
+              # Read the whole request head, answering per line sends extra responses
+              # that are left unread on the keep-alive connection
+              while (line = client.gets) && line != "\r\n"; end
+              break unless line
+
               client.write("HTTP/1.1 200 OK\r\nContent-Type: plain/test\r\nContent-Length: 11\r\nConnection: keep-alive\r\n\r\nHello There")
             rescue
               break

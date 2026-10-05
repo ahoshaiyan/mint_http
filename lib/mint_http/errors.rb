@@ -37,6 +37,15 @@ module MintHttp
   class WriteTimeoutError < TimeoutError; end
   class OpenTimeoutError < TimeoutError; end
 
+  # No connection could be acquired from MintHttp::Pool in time. The request was not sent.
+  # A RuntimeError, as raised by previous versions.
+  class PoolTimeoutError < RuntimeError; end
+
+  # The response was cut short: the connection closed before the full body arrived.
+  # The request reached the server. Only raised for requests built with
+  # raise_on_truncated_body, otherwise the truncated body is returned.
+  class ProtocolError < Error; end
+
   class ResponseError < Error
     # @return [HTTP::Response]
     attr_reader :response
